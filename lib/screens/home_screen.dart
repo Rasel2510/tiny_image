@@ -31,8 +31,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.initState();
     _headerAnim = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 800));
-    _headerFade = CurvedAnimation(
-        parent: _headerAnim, curve: Curves.easeOut);
+    _headerFade = CurvedAnimation(parent: _headerAnim, curve: Curves.easeOut);
     _headerAnim.forward();
   }
 
@@ -86,7 +85,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     try {
       final tempDir = await getTemporaryDirectory();
-      final ext = _format.toLowerCase() == 'jpeg' ? 'jpg' : _format.toLowerCase();
+      final ext =
+          _format.toLowerCase() == 'jpeg' ? 'jpg' : _format.toLowerCase();
       final outPath =
           '${tempDir.path}/tinyimg_${DateTime.now().millisecondsSinceEpoch}.$ext';
 
@@ -155,7 +155,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     int saved = 0;
     for (final img in _images) {
       if (img.compressedSize != null) {
-        saved += (img.originalSize - img.compressedSize!).clamp(0, img.originalSize);
+        saved +=
+            (img.originalSize - img.compressedSize!).clamp(0, img.originalSize);
       }
     }
     return saved;
@@ -214,7 +215,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       child: Row(
         children: [
           Container(
-            width: 36, height: 36,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [AppColors.accent, AppColors.accent2],
@@ -248,7 +250,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             GestureDetector(
               onTap: _clearAll,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(8),
@@ -270,7 +273,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildStatsBar() {
-    final done = _images.where((i) => i.status == CompressionStatus.done).length;
+    final done =
+        _images.where((i) => i.status == CompressionStatus.done).length;
     final total = _images.length;
     final saved = _totalSaved;
 
@@ -286,8 +290,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         children: [
           _statChip('Files', '$done/$total'),
           _divider(),
-          _statChip('Saved', _formatBytes(saved),
-              highlight: saved > 0),
+          _statChip('Saved', _formatBytes(saved), highlight: saved > 0),
           _divider(),
           _statChip(
             'Avg',
@@ -331,7 +334,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _divider() {
     return Container(
-      width: 1, height: 32,
+      width: 1,
+      height: 32,
       color: AppColors.border,
       margin: const EdgeInsets.symmetric(horizontal: 8),
     );
@@ -377,7 +381,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.accent.withOpacity(0.3),
+                      color: AppColors.accent.withValues(alpha: 0.3),
                       blurRadius: 20,
                       offset: const Offset(0, 6),
                     )
@@ -410,13 +414,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   .where((i) => i.status == CompressionStatus.done)
                   .toList();
               if (done.isEmpty) return;
-              final paths = done
-                  .map((i) => XFile(i.compressedFile!.path))
-                  .toList();
+              final paths =
+                  done.map((i) => XFile(i.compressedFile!.path)).toList();
               await Share.shareXFiles(paths, text: 'Compressed with TinyImg');
             },
             child: Container(
-              height: 52, width: 52,
+              height: 52,
+              width: 52,
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(14),
