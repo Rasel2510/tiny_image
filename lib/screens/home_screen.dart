@@ -19,19 +19,18 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   final List<ImageItem> _images = [];
-  int    _quality = 75;
-  String _format  = 'JPEG';
+  int _quality = 75;
+  String _format = 'JPEG';
 
   late AnimationController _headerAnim;
-  late Animation<double>   _headerFade;
+  late Animation<double> _headerFade;
 
   @override
   void initState() {
     super.initState();
     _headerAnim = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 700));
-    _headerFade =
-        CurvedAnimation(parent: _headerAnim, curve: Curves.easeOut);
+    _headerFade = CurvedAnimation(parent: _headerAnim, curve: Curves.easeOut);
     _headerAnim.forward();
   }
 
@@ -45,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Future<void> _pickImages() async {
     final picker = ImagePicker();
-    final files  = await picker.pickMultiImage(imageQuality: 100);
+    final files = await picker.pickMultiImage(imageQuality: 100);
     if (files.isEmpty) return;
 
     final newItems = <ImageItem>[];
@@ -53,10 +52,10 @@ class _HomeScreenState extends State<HomeScreen>
       final file = File(f.path);
       final stat = await file.stat();
       newItems.add(ImageItem(
-        id           : '${DateTime.now().microsecondsSinceEpoch}_${f.name}',
-        originalFile : file,
-        originalName : f.name,
-        originalSize : stat.size,
+        id: '${DateTime.now().microsecondsSinceEpoch}_${f.name}',
+        originalFile: file,
+        originalName: f.name,
+        originalSize: stat.size,
       ));
     }
 
@@ -77,18 +76,18 @@ class _HomeScreenState extends State<HomeScreen>
     // Reset state for retry
     setState(() {
       _images[idx] = _images[idx].copyWith(
-        status        : CompressionStatus.compressing,
-        progress      : 0,
+        status: CompressionStatus.compressing,
+        progress: 0,
         compressedFile: null,
         compressedSize: null,
-        errorMessage  : null,
+        errorMessage: null,
       );
     });
 
     final result = await CompressionService.compress(
-      inputFile    : _images[idx].originalFile,
-      quality      : _quality,
-      outputFormat : _format,
+      inputFile: _images[idx].originalFile,
+      quality: _quality,
+      outputFormat: _format,
     );
 
     if (!mounted) return;
@@ -98,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen>
     if (result == null) {
       setState(() {
         _images[currentIdx] = _images[currentIdx].copyWith(
-          status      : CompressionStatus.error,
+          status: CompressionStatus.error,
           errorMessage: 'Compression failed. Try a different format.',
         );
       });
@@ -114,8 +113,8 @@ class _HomeScreenState extends State<HomeScreen>
       _images[finalIdx] = _images[finalIdx].copyWith(
         compressedFile: result,
         compressedSize: stat.size,
-        status        : CompressionStatus.done,
-        progress      : 1,
+        status: CompressionStatus.done,
+        progress: 1,
       );
     });
 
@@ -140,9 +139,8 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _shareAll() async {
-    final done = _images
-        .where((i) => i.status == CompressionStatus.done)
-        .toList();
+    final done =
+        _images.where((i) => i.status == CompressionStatus.done).toList();
     if (done.isEmpty) return;
     await Share.shareXFiles(
       done.map((i) => XFile(i.compressedFile!.path)).toList(),
@@ -156,7 +154,8 @@ class _HomeScreenState extends State<HomeScreen>
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(ok ? 'Saved to gallery ✓' : 'Could not save to gallery'),
-      backgroundColor: ok ? AppColors.green.withAlpha(200) : AppColors.red.withAlpha(200),
+      backgroundColor:
+          ok ? AppColors.green.withAlpha(200) : AppColors.red.withAlpha(200),
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       margin: const EdgeInsets.all(16),
@@ -181,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   String _fmtBytes(int bytes) {
-    if (bytes < 1024)        return '$bytes B';
+    if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
     return '${(bytes / (1024 * 1024)).toStringAsFixed(2)} MB';
   }
@@ -198,11 +197,11 @@ class _HomeScreenState extends State<HomeScreen>
           children: [
             FadeTransition(opacity: _headerFade, child: _buildHeader()),
             SettingsBar(
-              quality          : _quality,
-              format           : _format,
-              onQualityChanged : (v) => setState(() => _quality = v),
-              onFormatChanged  : (v) => setState(() => _format = v),
-              onRecompress     : _images.isNotEmpty ? _recompressAll : null,
+              quality: _quality,
+              format: _format,
+              onQualityChanged: (v) => setState(() => _quality = v),
+              onFormatChanged: (v) => setState(() => _format = v),
+              onRecompress: _images.isNotEmpty ? _recompressAll : null,
             ),
             if (_images.isNotEmpty) _buildStatsBar(),
             Expanded(
@@ -223,7 +222,8 @@ class _HomeScreenState extends State<HomeScreen>
       child: Row(
         children: [
           Container(
-            width: 36, height: 36,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [AppColors.accent, AppColors.accent2],
@@ -273,7 +273,8 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildStatsBar() {
-    final done  = _images.where((i) => i.status == CompressionStatus.done).length;
+    final done =
+        _images.where((i) => i.status == CompressionStatus.done).length;
     final total = _images.length;
     final saved = _totalSaved;
 
@@ -296,11 +297,12 @@ class _HomeScreenState extends State<HomeScreen>
       ),
       child: Row(
         children: [
-          _statChip('Files',   '$done / $total'),
+          _statChip('Files', '$done / $total'),
           _statDivider(),
-          _statChip('Saved',   _fmtBytes(saved),  highlight: saved > 0),
+          _statChip('Saved', _fmtBytes(saved), highlight: saved > 0),
           _statDivider(),
-          _statChip('Avg',
+          _statChip(
+            'Avg',
             done > 0 ? '-${avgSaving.toStringAsFixed(0)}%' : '--',
             highlight: done > 0,
           ),
@@ -333,7 +335,8 @@ class _HomeScreenState extends State<HomeScreen>
       );
 
   Widget _statDivider() => Container(
-        width: 1, height: 30,
+        width: 1,
+        height: 30,
         color: AppColors.border,
         margin: const EdgeInsets.symmetric(horizontal: 8),
       );
@@ -345,12 +348,12 @@ class _HomeScreenState extends State<HomeScreen>
       itemBuilder: (_, i) {
         final item = _images[i];
         return ImageCard(
-          key      : ValueKey(item.id),
-          item     : item,
-          onShare  : () => _shareOne(item),
-          onSave   : () => _saveToGallery(item),
-          onRemove : () => _removeImage(item.id),
-          onRetry  : () => _compressOne(item),
+          key: ValueKey(item.id),
+          item: item,
+          onShare: () => _shareOne(item),
+          onSave: () => _saveToGallery(item),
+          onRemove: () => _removeImage(item.id),
+          onRetry: () => _compressOne(item),
         );
       },
     );
@@ -359,7 +362,7 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _buildBottomBar() {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 10, 24, 24),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.bg,
         border: Border(top: BorderSide(color: AppColors.border)),
       ),
@@ -368,13 +371,13 @@ class _HomeScreenState extends State<HomeScreen>
           Expanded(
             child: _gradientButton(
               label: 'Add More',
-              icon : Icons.add_photo_alternate_outlined,
+              icon: Icons.add_photo_alternate_outlined,
               onTap: _pickImages,
             ),
           ),
           const SizedBox(width: 12),
           _iconButton(
-            icon : Icons.ios_share_rounded,
+            icon: Icons.ios_share_rounded,
             onTap: _shareAll,
           ),
         ],
@@ -398,9 +401,9 @@ class _HomeScreenState extends State<HomeScreen>
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color     : AppColors.accent.withAlpha(77),
+              color: AppColors.accent.withAlpha(77),
               blurRadius: 20,
-              offset    : const Offset(0, 6),
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -411,9 +414,9 @@ class _HomeScreenState extends State<HomeScreen>
             const SizedBox(width: 8),
             Text(label,
                 style: const TextStyle(
-                  color      : Colors.white,
-                  fontSize   : 15,
-                  fontWeight : FontWeight.w600,
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: -0.2,
                 )),
           ],
@@ -429,11 +432,12 @@ class _HomeScreenState extends State<HomeScreen>
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 52, width: 52,
+        height: 52,
+        width: 52,
         decoration: BoxDecoration(
-          color        : AppColors.surface,
-          borderRadius : BorderRadius.circular(14),
-          border       : Border.all(color: AppColors.border),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.border),
         ),
         child: Icon(icon, color: AppColors.text, size: 20),
       ),
