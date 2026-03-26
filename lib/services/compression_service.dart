@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
+import 'package:gal/gal.dart';
 
 class CompressionService {
+  /// Compress [inputFile] and return the resulting [File].
+  /// Returns null on failure.
   static Future<File?> compress({
     required File inputFile,
     required int quality,
@@ -11,53 +13,49 @@ class CompressionService {
   }) async {
     try {
       final tempDir = await getTemporaryDirectory();
-      final ext = outputFormat.toLowerCase();
-      final fileName =
-          'compressed_${DateTime.now().millisecondsSinceEpoch}.$ext';
-      final outputPath = p.join(tempDir.path, fileName);
-
-      CompressFormat format;
-      switch (ext) {
-        case 'webp':
-          format = CompressFormat.webp;
-          break;
-        case 'png':
-          format = CompressFormat.png;
-          break;
-        default:
-          format = CompressFormat.jpeg;
-      }
+      final ext     = _ext(outputFormat);
+      final outPath =
+          '${tempDir.path}/tinyimg_${DateTime.now().millisecondsSinceEpoch}.$ext';
 
       final result = await FlutterImageCompress.compressAndGetFile(
         inputFile.absolute.path,
-        outputPath,
-        quality: quality,
-        format: format,
-        keepExif: false,
+        outPath,
+        quality  : quality,
+        format   : _format(outputFormat),
+        keepExif : false,
+        autoCorrectionAngle: true,
       );
 
       if (result == null) return null;
       return File(result.path);
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
 
+  /// Save [file] to the device photo gallery.
   static Future<bool> saveToGallery(File file) async {
     try {
-      // Using image_gallery_saver
-      // ignore: depend_on_referenced_packages
-      final result = await ImageGallerySaver.saveFile(file.absolute.path);
-      return result['isSuccess'] ?? false;
-    } catch (e) {
+      await Gal.putImage(file.path);
+      return true;
+    } catch (_) {
       return false;
     }
   }
-}
 
-// Stub import to avoid compile error if package not linked yet
-class ImageGallerySaver {
-  static Future<Map<String, dynamic>> saveFile(String path) async {
-    return {'isSuccess': true};
+  static String _ext(String format) {
+    switch (format) {
+      case 'PNG'  : return 'png';
+      case 'WebP' : return 'webp';
+      default     : return 'jpg';
+    }
+  }
+
+  static CompressFormat _format(String format) {
+    switch (format) {
+      case 'PNG'  : return CompressFormat.png;
+      case 'WebP' : return CompressFormat.webp;
+      default     : return CompressFormat.jpeg;
+    }
   }
 }
